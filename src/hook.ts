@@ -1,5 +1,11 @@
 import { buildHeaders } from "./buildHeader";
 
+type BaseRes = {
+  code: string;
+  msg: string | null;
+  status: number;
+};
+
 export async function request<Res>(
   url: string,
   args: any,
@@ -20,14 +26,9 @@ export async function request<Res>(
     method: method,
     credentials: "include",
   });
-  const result = await response.json() as {
-    body: any,
-    code: string,
-    msg: string | null,
-    status: number,
-  }
+  const result: Res & BaseRes = await response.json();
   if (result.code != "200") {
     throw new Error(`ccw request failed: ${result.msg}`, { cause: result });
   }
-  return { data: result as Res };
+  return { data: result };
 }
